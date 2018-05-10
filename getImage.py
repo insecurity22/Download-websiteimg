@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import base64
 import urllib.request
+import time
 
 def help():
     print('Usage : getImage [url]')
@@ -23,15 +24,14 @@ def naming(num):
     print(full_name)
     return full_name
 
+# I can't use urllib because 403 forbiden error, So I found other way.
 def download_img(url):
-    # 403 forbiden because you know bot
-    # urllib reference : https://docs.python.org/3.4/library/urllib.html
-    hdr = {'User-Agent': 'Mozila/5.0', 'referer': 'http:/m.naver.com'}
-    req = urllib.request.Request(url, hdr)
+    image = requests.get(url).content
+    # response content is binary ex) b'\xff\xd8 ...
     try:
-        #urllib.request.urlopen(req) # call web document
-        full_name = naming(num)
-        #urllib.request.urlretrieve(url, full_name)
+        file_name = naming(num)
+        with open(file_name, 'wb')as f:
+            f.write(image)
     except urllib.request.HTTPError as e:
         print(e)
 
@@ -50,7 +50,7 @@ def start(url):
         global num
         num = 0
 
-        for i in find_img(decodedtags):
+        for i in find_img(decodedtags): # url
             print(i)
             num += 1
             download_img(i)
