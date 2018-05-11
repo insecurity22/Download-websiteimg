@@ -58,35 +58,36 @@ def start(url):
             num += 1
             download_img(i)
 
-        print("\nDownload complete.")
+        print("\nDownload complete.\n")
 
     else:
         print("Can't connect\n")
 
-if(len(sys.argv)!=3): # Usage
+def automatic(episode_num):
+    # start first episode folder
+    global site
+    if episode_num < 10:
+        site = (sys.argv[1])[:-7] + "0" + str(episode_num) + ".html"
+    else:
+        site = (sys.argv[1])[:-7] + str(episode_num) + ".html"
+    print(site)
+
+    global folder
+    folder = (sys.argv[2])[:-2] + str(episode_num) + (sys.argv[2])[-1:]
+    print(folder)
+
+def createfolder(save_path):
+    if not os.path.isdir(save_path):
+        print("\nCreating Folder...\n")
+        os.makedirs(save_path)
+
+if(len(sys.argv)!=4): # Usage
     help()
 
-# Create folder
-global save_path
-save_path = sys.argv[2]
-if not os.path.isdir(save_path):
-    print("Creating Folder...")
-    os.makedirs(save_path)
-
-# start first episode folder
 episode_num = 1
-global site
-site = (sys.argv[1])[:-7] + str(episode_num) + ".html"
-print(site)
-
-global folder
-if episode_num<10:
-    folder = save_path[:-2] + "0" + str(episode_num) + save_path[-1:]
-else:
-    folder = save_path[:-2] + str(episode_num) + save_path[-1:]
-print(folder)
-
-for i in range(0, sys.argv[3]):
+for i in range(0, int(sys.argv[3])):
+    automatic(episode_num)
+    createfolder(folder)
     start(site)
     episode_num += 1
 
