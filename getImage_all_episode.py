@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import base64
 import urllib.request
 import os
-import string
+import time
 
 def help():
     # getImage 다운로드할url 다운로드할파일경로 웹툰마지막화숫자
@@ -57,6 +57,7 @@ def start(url):
             print(i)
             num += 1
             download_img(i)
+            time.sleep(3)
 
         print("\nDownload complete.\n")
 
@@ -73,7 +74,7 @@ def automatic(episode_num):
     print(site)
 
     global folder
-    folder = (sys.argv[2])[:-2] + str(episode_num) + (sys.argv[2])[-1:]
+    folder = (sys.argv[2])[:-3] + str(episode_num) + (sys.argv[2])[-1:]
     print(folder)
 
 def createfolder(save_path):
@@ -84,8 +85,8 @@ def createfolder(save_path):
 if(len(sys.argv)!=4): # Usage
     help()
 
-episode_num = 1
-for i in range(0, int(sys.argv[3])):
+episode_num = 19 # you can update this number.
+for i in range(episode_num, int(sys.argv[3])):
     automatic(episode_num)
     createfolder(folder)
     start(site)

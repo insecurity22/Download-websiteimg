@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import base64
 import urllib.request
 import os
+import time
 
 def help():
     print('Usage : getImage url file_path_for_save')
@@ -55,6 +56,7 @@ def start(url):
             print(i)
             num += 1
             download_img(i)
+            time.sleep(4) # because web server can refuse to 10054 error
 
         print("\nDownload complete.")
 
