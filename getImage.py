@@ -4,10 +4,11 @@ import requests
 from bs4 import BeautifulSoup
 import base64
 import urllib.request
-import time
+import os
 
 def help():
-    print('Usage : getImage [url]')
+    print('Usage : getImage url file_path_for_save')
+    sys.exit(1)
 
 # regex = Regular expression
 # regex reference : https://wikidocs.net/4308
@@ -20,18 +21,18 @@ def find_img(content):
     return regex.findall(str(content))
 
 def naming(num):
-    full_name = str(num) + ".jpg"
+    full_name = save_path + "\\" + str(num) + ".jpg"
     print(full_name)
     return full_name
 
 # I can't use urllib because 403 forbiden error, So I found other way.
 def download_img(url):
-    image = requests.get(url).content
+    img = requests.get(url).content
     # response content is binary ex) b'\xff\xd8 ...
     try:
         file_name = naming(num)
         with open(file_name, 'wb')as f:
-            f.write(image)
+            f.write(img)
     except urllib.request.HTTPError as e:
         print(e)
 
@@ -55,12 +56,19 @@ def start(url):
             num += 1
             download_img(i)
 
-        print("\nDownloading...")
+        print("\nDownload complete.")
 
     else:
         print("Can't connect\n")
 
-if(len(sys.argv)!=2): # Usage
+if(len(sys.argv)!=3): # Usage
     help()
+
+global save_path
+save_path = sys.argv[2]
+
+if not os.path.isdir(save_path): # folder
+    print("Creating Folder...")
+    os.makedirs(save_path)
 
 start(sys.argv[1])
