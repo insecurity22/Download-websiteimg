@@ -111,7 +111,6 @@ while True:
         changed_url = change_url(sys.argv[1])
         print(changed_url)
         download_webtoon(changed_url, num)
-        print(episode)
     except:
         break
 
