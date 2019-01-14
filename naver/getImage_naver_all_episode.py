@@ -1,18 +1,18 @@
+
 import sys
 import requests
 from bs4 import BeautifulSoup
 import re
-import os
 import time
-import urllib
+import os
 
 def help():
     #
-    # ex) ./getImage url save_path episode_number
-    #
+    # ./getImage url save_path episode_number
     # url = https://...
     # save_path = C:\Webtoon_name\17화
     # episode_number = 17
+    #
     print('Usage: ./getImage url save_path episode_number')
     sys.exit(1)
 
@@ -21,97 +21,82 @@ def create_folder(save_path):
         print("Creating new folder...\n")
         os.makedirs(save_path)
 
-def find_url(content):
+def find_img_url_to_regex(content):
     regex = re.compile('https:\/\/image.*\.jpg')
     return regex.findall(str(content))
 
 def naming(num):
     # save_path + number(ex: 1) + ".jpg"
-    global path
-    name = path + "\\" + str(num) + ".jpg"
+    name = sys.argv[2] + "\\" + str(num) + ".jpg"
     print(name)
     return name
 
-def download_img(url):
-    hdr = {'User-Agent':'Mozilla/5.0', 'referer':'http://m.naver.com'}
-    img = requests.get(url, headers=hdr).content # 403 forbiden
-    print(img) # response content is binary ex) b'\xff\xd8 ...
-    try:
-        global num
-        num += 1
-        imgfile_name = naming(num) # 1.jpg, 2.jpg, 3.jpg ...
-        with open(imgfile_name, 'wb') as f:
-            f.write(img)
-    except urllib.request.HTTPError as e:
-        print(e)
-
-def change_folder_path(path):
-    global episode
-    text = str(episode) + "화"
-    path_text = re.sub(r'[0-9]*화', text, path) # 패턴과 일치하는 문자열 변경
-    return path_text
-
-def change_url(url):
-    global episode
-    no = "no=" + str(episode) + "&"
-    url_text = re.sub(r'no=.*&', no, url)
-    return url_text
-
-# Start
-def download_webtoon(url, num):
-    # HTTP GET Request
+def download_webtoon(url):
     resp = requests.get(url)
-
-    # If is_ok is a valid response, return True
     is_ok = resp.ok
     if(is_ok == True):
-        html = resp.text    # html Source
-        soup = BeautifulSoup(html, 'html.parser')
+        html = resp.text # html source
+        soup = BeautifulSoup(html, 'html.parser') # for parsing
 
+        # After img tag id find, all image download
         id_num = 0
+        hdr = {'User-Agent':'Mozilla/5.0', 'referer':'http://m.naver.com'}
         while True:
             try:
+                # Find
                 img_tag_id = "#content_image_" + str(id_num)
-                tags = soup.select(img_tag_id) # Find "img tag" to id value in html
-                url_img_tag = find_url(tags) # Find "an url" in img tag
-                print(url_img_tag)
+                select = soup.select(img_tag_id) # ex) <img src="https:// ...
+                regex = find_img_url_to_regex(select) # https:// ...
+                print(regex)
 
-                download_img(url_img_tag[num])
+                # Download
+                img = requests.get(regex[0], headers=hdr).content
+                print(img) # response content is binary ex) b'\xff\xd8 ...
+
+                filename = naming(id_num+1)
+                with open(filename, 'wb') as f:
+                    f.write(img)
                 id_num += 1
                 time.sleep(2)
-            except:
+
+            except Exception as ex:
+                return regex
                 break
 
-        print("\nDownload complete.\n")
+def change_url_and_folder_path(url, path):
+    global episode
+    episode += 1
+
+    # Change URL
+    no = "no=" + str(episode) + "&"
+    url_text = re.sub(r'no=.*&', no, url)
+    print(url_text)
+
+    # Change save path
+    text = str(episode) + "화"
+    path_text = re.sub(r'[0-9]*화', text, path)  # 패턴(text)과 일치하는 문자열(path중) 변경
+    print(path_text)
+    return (url_text, path_text)
 
 if(len(sys.argv)!=4): # Usage
     help()
 
-print("\nPlease check it...")
-print("argv[1] = " + sys.argv[1]) # url
-print("argv[2] = " + sys.argv[2]) # save path
-print("argv[3] = " + sys.argv[3] + "\n") # episode
-time.sleep(1)
+# Check input value
+print("Your input value is ...\nargv[1] = ", sys.argv[1])
+print("argv[2] = ", sys.argv[2])
+print("argv[3] = ", sys.argv[3], "\n")
 
-num = 0
-episode = int(sys.argv[3]) # begin the episode
-path = sys.argv[2]
-
-create_folder(sys.argv[2]) # make a folder
-download_webtoon(sys.argv[1], num)
-time.sleep(1)
+change = 0
+episode = int(sys.argv[3])
 
 while True:
     try:
-        num = 0
-        episode += 1
-        path = change_folder_path(sys.argv[2])
-        create_folder(path)
-
-        changed_url = change_url(sys.argv[1])
-        print(changed_url)
-        download_webtoon(changed_url, num)
-    except:
-        break
-
-
+        create_folder(sys.argv[2])
+        checklist = download_webtoon(sys.argv[1])
+        print("Download complete", episode, "화")
+        (sys.argv[1], sys.argv[2]) = change_url_and_folder_path(sys.argv[1], sys.argv[2])
+    except Exception as ex:
+        if not checklist: # If List is empty
+            continue
+        if ex:
+            break
