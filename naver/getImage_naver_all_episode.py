@@ -1,4 +1,4 @@
-
+﻿
 import sys
 import requests
 from bs4 import BeautifulSoup
@@ -86,7 +86,6 @@ print("Your input value is ...\nargv[1] = ", sys.argv[1])
 print("argv[2] = ", sys.argv[2])
 print("argv[3] = ", sys.argv[3], "\n")
 
-change = 0
 episode = int(sys.argv[3])
 
 while True:
