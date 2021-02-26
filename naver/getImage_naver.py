@@ -49,7 +49,6 @@ def download(url, savepath):
             except Exception as ex:
                 break
 
-
 if __name__ == '__main__':
 
     if len(sys.argv) != 3:
