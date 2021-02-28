@@ -37,7 +37,7 @@ def download(url, savepath):
 
                 # Create folder
                 createFolder(savepath)
-                filename = savepath + "\\" + str(id_num) + re.compile('(.png|.jpg|jpeg|.gif)').search(img_src[0]).group()
+                filename = savepath + "\\" + str(id_num) + re.compile('(.png|.jpg|.jpeg|.gif)').search(img_src[0]).group()
                 print(filename + "에 저장 중...")
 
                 # Download
