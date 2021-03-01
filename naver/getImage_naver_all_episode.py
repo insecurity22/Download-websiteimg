@@ -36,7 +36,7 @@ def download(url, savepath, episodenum):
                 print(img_src, "has been downloaded")
 
                 # Download
-                filename = savepath + str(id_num) + re.compile('(.png|.jpg|jpeg|.gif)').search(img_src[0]).group()
+                filename = savepath + str(id_num) + re.compile('(.png|.jpg|.jpeg|.gif)').search(img_src[0]).group()
                 img = requests.get(img_src[0], headers=header).content # ex) b'\xff\xd8 ...
                 with open(filename, 'wb') as f:
                     f.write(img)
