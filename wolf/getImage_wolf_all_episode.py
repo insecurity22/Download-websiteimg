@@ -45,9 +45,9 @@ def download(url, savepath):
             if img_tag:
                 img_tag = soup.select("img[src*='" + c + "']")
                 break
-            if not img_tag:
-                print("다운받을 이미지가 없어 종료되었습니다.")
-                sys.exit()
+        if not img_tag:
+            print("다운받을 이미지가 없어 종료되었습니다.")
+            sys.exit()
 
         path = "./chromedriver.exe"
         driver = webdriver.Chrome(path)
