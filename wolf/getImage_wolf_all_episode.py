@@ -16,6 +16,7 @@ def getDomain(url):
 
 def download(url, savepath):
     id_num = 0
+    cloud = ['https://i0.scloud16.com', 'https://i5.bacloud1.com', 'https://i6.bacloud1.com']
 
     # Set header
     headers = {
@@ -35,14 +36,22 @@ def download(url, savepath):
         "user-agent": "Mozilla / 5.0(Windows NT 10.0; Win64; x64) AppleWebKit/537.36(KHTML, like Gecko) Chrome / 88.0.4324.190 Safari/537.36"
     }
 
-    path = "./chromedriver.exe"
-    driver = webdriver.Chrome(path)
-
     resp = requests.get(url)
     if(resp.ok == True):
         html = resp.text
         soup = BeautifulSoup(html, 'html.parser')
-        img_tag = soup.select("img[src*='https://i5.bacloud1.com']")
+        for c in cloud:
+            img_tag = soup.select("img[src*='" + c + "']")
+            if img_tag:
+                img_tag = soup.select("img[src*='" + c + "']")
+                break
+            if not img_tag:
+                print("다운받을 이미지가 없어 종료되었습니다.")
+                sys.exit()
+
+        path = "./chromedriver.exe"
+        driver = webdriver.Chrome(path)
+
         for tag in img_tag:
             # print(tag['src'])
             # https://stackoverflow.com/questions/43982002/extract-src-attribute-from-img-tag-using-beautifulsoup/47166671
@@ -86,6 +95,7 @@ if __name__ == '__main__':
 
             print(str(episodenum) + "화 다운로드 시작")
             url = url.replace(re.compile('num=\d*').search(url).group(), "num=" + str(episodenum))
+            print(url)
             download(url, folder)
 
             # Change URL
